@@ -1,0 +1,18 @@
+# Rebuilds the Vercel site once a day so new Substack posts appear without
+# anyone pressing anything. (The frontend fetches the feed at build time.)
+# Needs repo secret: VERCEL_DEPLOY_HOOK_URL
+name: Daily blog sync
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # 07:00 Nairobi
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy hook
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: curl --fail --silent --show-error -X POST "$HOOK"

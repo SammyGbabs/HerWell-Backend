@@ -1,0 +1,34 @@
+"""
+Create the first admin account from environment variables, if it doesn't exist.
+
+Render's free plan has no shell, so build.sh runs this on every deploy. It is a
+no-op once the account exists, and it never resets an existing password.
+
+    DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD
+"""
+
+import os
+
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+
+
+class Command(BaseCommand):
+    help = "Create a superuser from DJANGO_SUPERUSER_* env vars if it doesn't exist yet."
+
+    def handle(self, *args, **options):
+        username = os.environ.get("DJANGO_SUPERUSER_USERNAME")
+        password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
+        email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "")
+
+        if not username or not password:
+            self.stdout.write("ensure_superuser: env vars not set, skipping.")
+            return
+
+        User = get_user_model()
+        if User.objects.filter(username=username).exists():
+            self.stdout.write(f"ensure_superuser: '{username}' already exists.")
+            return
+
+        User.objects.create_superuser(username=username, email=email, password=password)
+        self.stdout.write(self.style.SUCCESS(f"ensure_superuser: created '{username}'."))

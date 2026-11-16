@@ -1,0 +1,11 @@
+/* Small HerWell touches on top of the Unfold admin theme. */
+#nav-sidebar .material-symbols-outlined,
+nav .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400;
+}
+
+/* Fieldset descriptions carry real instructions for the client. Make them readable. */
+fieldset .description {
+    max-width: 70ch;
+    line-height: 1.55;
+}
